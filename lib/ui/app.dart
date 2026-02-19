@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:note_book_app/bindings/app_binding.dart';
-import '../ui/pages/home_page.dart';
+import '../../routes/app_routes.dart';
+import '../../routes/app_pages.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -11,7 +12,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       initialBinding: AppBinding(),
-      home: NotesHomePage(),
+      getPages: AppPages.pages,
+      initialRoute: AppRoutes.home,
     );
   }
 }
