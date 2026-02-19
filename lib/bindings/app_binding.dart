@@ -8,6 +8,7 @@ import '../data/repositories/notes_repository.dart';
 import '../data/repositories/notes_repositories_implement.dart';
 import '../controllers/home_controller.dart';
 import '../controllers/notes_controller.dart';
+import '../core/sync/connectivity_service.dart';
 
 class AppBinding extends Bindings {
   @override
@@ -18,7 +19,7 @@ class AppBinding extends Bindings {
     Get.put(AppDatabase(), permanent: true);
     Get.put(NotesDao(Get.find()), permanent: true);
     Get.put(SyncQueueDao(Get.find()), permanent: true);
-
+    Get.put(ConnectivityService(), permanent: true);  
     // Sync
     Get.put(SyncEngine(), permanent: true);
 
