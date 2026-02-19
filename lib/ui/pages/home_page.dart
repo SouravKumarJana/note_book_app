@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:note_book_app/controllers/home_controller.dart';
 import 'notes_list_page.dart';
 import 'add_note_page.dart';
+import '../../constants/app_string.dart';
 
 class NotesHomePage extends StatelessWidget {
   final HomeController controller = Get.find<HomeController>();
@@ -17,7 +18,7 @@ class NotesHomePage extends StatelessWidget {
 
     return Obx(() {
       return Scaffold(
-        appBar: AppBar(title: const Text("Note Book App")),
+        appBar: AppBar(title: const Text(AppStrings.appTitle)),
         body: IndexedStack(
           index: controller.currentIndex.value,
           children: pages,
@@ -28,11 +29,11 @@ class NotesHomePage extends StatelessWidget {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.list),
-              label: "Notes",
+              label: AppStrings.notesTab,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add),
-              label: "Add",
+              label: "AppStrings.addNoteTab",
             ),
           ],
         ),
