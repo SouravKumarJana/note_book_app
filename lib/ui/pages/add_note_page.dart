@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:note_book_app/controllers/notes_controller.dart';
+import '../../constants/app_string.dart';
 
 class AddNotePage extends StatelessWidget {
   
@@ -16,11 +17,11 @@ class AddNotePage extends StatelessWidget {
         children: [
           TextField(
             controller: controller.noteTitleController,
-            decoration: const InputDecoration(labelText: "Title"),
+            decoration: const InputDecoration(labelText: AppStrings.noteTitleLabel),
           ),
           TextField(
             controller: controller.noteContentController,
-            decoration: const InputDecoration(labelText: "Content"),
+            decoration: const InputDecoration(labelText: AppStrings.noteContentLabel),
           ),
           const SizedBox(height: 20),
           Obx(() => ElevatedButton(
@@ -29,7 +30,7 @@ class AddNotePage extends StatelessWidget {
                     : controller.addNote,
                 child: controller.isSaving.value
                     ? const CircularProgressIndicator()
-                    : const Text("Save"),
+                    : const Text(AppStrings.save),
               )),
         ],
       ),

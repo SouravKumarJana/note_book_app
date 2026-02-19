@@ -4,17 +4,32 @@ import '../../data/local/sync_queue_dao.dart';
 import '../network/rest_client.dart';
 import 'retry_policy.dart';
 import '../../data/models/note_model.dart';
+import 'connectivity_service.dart';
 
 class SyncEngine {
   final RestClient api = Get.find();
   final NotesDao notesDao = Get.find();
   final SyncQueueDao queueDao = Get.find();
+  final ConnectivityService connectivity = Get.find();
   final RetryPolicy retryPolicy = RetryPolicy();
 
   bool _syncing = false;
 
+  SyncEngine() {
+    _listenConnectivity();
+  }
+
+  void _listenConnectivity() {
+    connectivity.connectionStream.listen((isConnected) {
+      if (isConnected) {
+        trigger();
+      }
+    });
+  }
+
   Future<void> trigger() async {
     if (_syncing) return;
+    if (!connectivity.isConnected) return;
     _syncing = true;
 
     final queue = await queueDao.getAll();
@@ -24,7 +39,6 @@ class SyncEngine {
         final localNote = await notesDao.getById(item.noteId);
         if (localNote == null) continue;
 
-        // Convert Drift Note → NoteModel
         final noteModel = NoteModel(
           id: localNote.id,
           title: localNote.title,
@@ -35,17 +49,29 @@ class SyncEngine {
           version: localNote.version,
         );
 
-        if (item.operationType == "CREATE") {
-          await retryPolicy.execute(() => api.createNote(noteModel));
+        switch (item.operationType) {
+          case "CREATE":
+            final serverNote = await retryPolicy.execute(
+              () => api.createNote(noteModel),
+            );
+            await notesDao.replaceFromServer(serverNote);
+            break;
+
+          case "UPDATE":
+            final serverNote = await retryPolicy.execute(
+              () => api.updateNote(noteModel.id, noteModel),
+            );
+            await notesDao.replaceFromServer(serverNote);
+            break;
+
+          case "DELETE":
+            await retryPolicy.execute(
+              () => api.deleteNote(item.noteId),
+            );
+            break;
         }
 
-        if (item.operationType == "DELETE") {
-          await retryPolicy.execute(() => api.deleteNote(item.noteId));
-        }
-
-        await notesDao.markSynced(item.noteId);
         await queueDao.remove(item.id);
-
       } catch (e) {
         if (item.retryCount >= 3) {
           await queueDao.remove(item.id);
@@ -53,9 +79,26 @@ class SyncEngine {
           await queueDao.incrementRetry(item.id);
         }
       }
-
     }
 
+    await _pullFromServer();
+
     _syncing = false;
+  }
+
+  Future<void> _pullFromServer() async {
+    try {
+      final remoteNotes = await api.getAllNotes();
+
+      for (final remote in remoteNotes) {
+        final local = await notesDao.getById(remote.id);
+
+        if (local == null) {
+          await notesDao.replaceFromServer(remote);
+        } else if (remote.version > local.version) {
+          await notesDao.replaceFromServer(remote);
+        }
+      }
+    } catch (_) {}
   }
 }

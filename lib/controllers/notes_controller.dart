@@ -4,43 +4,42 @@ import '../../controllers/base_controller.dart';
 import '../../data/repositories/notes_repository.dart';
 import '../../entities/note_entity.dart';
 
+
 class NotesController extends BaseController {
   final NotesRepository repo = Get.find();
 
-  // Reactive Notes List
   final notes = <NoteEntity>[].obs;
 
-  // Text Controllers (moved here)
   final noteTitleController = TextEditingController();
   final noteContentController = TextEditingController();
 
-  // Optional: Form validation state
   final isSaving = false.obs;
+
+  String? editingNoteId;
 
   @override
   void onInit() {
     super.onInit();
 
-    // Listen to notes stream
     repo.watchNotes().listen((data) {
       notes.value = data;
     });
   }
 
-  // Add Note
+  
   Future<void> addNote() async {
-    final noteTtitle = noteTitleController.text.trim();
-    final noteContent = noteContentController.text.trim();
+    final title = noteTitleController.text.trim();
+    final content = noteContentController.text.trim();
 
-    if (noteTtitle.isEmpty || noteContent.isEmpty) {
+    if (title.isEmpty || content.isEmpty) {
       Get.snackbar("Error", "All fields are required");
       return;
     }
 
     isSaving.value = true;
 
-    await callApi(
-      repo.createNote(noteTtitle, noteContent),
+    await noteExecutor(
+      repo.createNote(title, content),
     );
 
     noteTitleController.clear();
@@ -49,9 +48,45 @@ class NotesController extends BaseController {
     isSaving.value = false;
   }
 
-  // Delete Note
+  void initEditFromArguments() {
+    final note = Get.arguments as NoteEntity?;
+
+    if (note == null) return;
+
+    editingNoteId = note.id;
+    noteTitleController.text = note.title;
+    noteContentController.text = note.content;
+}
+
+  Future<void> updateNote() async {
+    final title = noteTitleController.text.trim();
+    final content = noteContentController.text.trim();
+
+    if (title.isEmpty || content.isEmpty) {
+      Get.snackbar("Error", "All fields required");
+      return;
+    }
+
+    if (editingNoteId == null) return;
+
+    isSaving.value = true;
+
+    await noteExecutor(
+      repo.updateNote(editingNoteId!, title, content),
+    );
+
+    isSaving.value = false;
+
+    noteTitleController.clear();
+    noteContentController.clear();
+    editingNoteId = null;
+
+    Get.back(); // return to list tab
+  }
+
+
   Future<void> deleteNote(String id) async {
-    await callApi(
+    await noteExecutor(
       repo.deleteNote(id),
     );
   }

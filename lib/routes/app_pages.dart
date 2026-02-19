@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:note_book_app/routes/app_routes.dart';
 import '../ui/pages/home_page.dart';
 import '../bindings/app_binding.dart';
-
+import '../ui/pages/edit_note_page.dart';
 class AppPages {
   static final pages = [
     GetPage(
@@ -10,5 +10,9 @@ class AppPages {
       page: () => NotesHomePage(),
       binding: AppBinding(),
     ),
+    GetPage(
+      name: AppRoutes.edit,
+      page: () => EditNotePage(),
+    )
   ];
 }

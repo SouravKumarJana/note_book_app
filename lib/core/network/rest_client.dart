@@ -8,9 +8,26 @@ part 'rest_client.g.dart';
 abstract class RestClient {
   factory RestClient(Dio dio, {String? baseUrl}) = _RestClient;
 
+  // CREATE
   @POST("/notes")
-  Future<void> createNote(@Body() NoteModel note);
+  Future<NoteModel> createNote(
+    @Body() NoteModel note,
+  );
 
+  // UPDATE
+  @PUT("/notes/{id}")
+  Future<NoteModel> updateNote(
+    @Path("id") String id,
+    @Body() NoteModel note,
+  );
+
+  // DELETE
   @DELETE("/notes/{id}")
-  Future<void> deleteNote(@Path("id") String id);
-} 
+  Future<void> deleteNote(
+    @Path("id") String id,
+  );
+
+  // GET ALL (for pull sync)
+  @GET("/notes")
+  Future<List<NoteModel>> getAllNotes();
+}

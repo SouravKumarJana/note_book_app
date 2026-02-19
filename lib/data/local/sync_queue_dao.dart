@@ -19,17 +19,17 @@ class SyncQueueDao {
       (db.delete(db.syncQueue)..where((t) => t.id.equals(id))).go();
   
   Future<void> incrementRetry(int id) async {
-  final item = await (db.select(db.syncQueue)
-        ..where((t) => t.id.equals(id)))
-      .getSingle();
+    final item = await (db.select(db.syncQueue)
+          ..where((t) => t.id.equals(id)))
+        .getSingle();
 
-  await (db.update(db.syncQueue)
-        ..where((t) => t.id.equals(id)))
-      .write(
-    SyncQueueCompanion(
-      retryCount: Value(item.retryCount + 1),
-    ),
-  );
-}
+    await (db.update(db.syncQueue)
+          ..where((t) => t.id.equals(id)))
+        .write(
+      SyncQueueCompanion(
+        retryCount: Value(item.retryCount + 1),
+      ),
+    );
+  }
 
 }

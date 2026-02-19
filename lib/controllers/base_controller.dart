@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
+import '../constants/app_string.dart';
 
 abstract class BaseController extends GetxController {
   final isLoading = false.obs;
   final errorMessage = RxnString();
 
-  Future<T?> callApi<T>(
+  Future<T?> noteExecutor<T>(
     Future<T> future,
   ) async {
     try {
@@ -16,7 +17,7 @@ abstract class BaseController extends GetxController {
       return response;
     } catch (e) {
       setError(e.toString());
-      Get.snackbar("Error", e.toString());
+      Get.snackbar(AppStrings.error, e.toString());
       return null;
     } finally {
       isLoading.value = false;

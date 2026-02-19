@@ -48,6 +48,21 @@ class NotesRepositoryImplement implements NotesRepository {
   }
 
   @override
+  Future<void> updateNote(String id, String title, String content) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    await notesDao.updateNote(
+      id,
+      title,
+      content,
+      now,
+    );
+
+    await queueDao.add(id, "UPDATE");
+    syncEngine.trigger();
+  }
+
+  @override
   Future<void> deleteNote(String id) async {
     await notesDao.softDelete(id);
     await queueDao.add(id, "DELETE");
