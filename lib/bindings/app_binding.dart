@@ -13,8 +13,7 @@ import '../core/sync/connectivity_service.dart';
 class AppBinding extends Bindings {
   @override
   void dependencies() {
-    NetworkModule.init();
-
+    NetworkModule.prepareDio();
     // Database
     Get.put(AppDatabase(), permanent: true);
     Get.put(NotesDao(Get.find()), permanent: true);
@@ -32,5 +31,6 @@ class AppBinding extends Bindings {
     // Controllers
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<NotesController>(() => NotesController());
+    //Get.lazyPut<ApiService>(() => ApiService(), fenix: true);
   }
 }

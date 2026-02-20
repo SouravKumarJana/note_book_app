@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../controllers/notes_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../constants/app_string.dart';
+
 class NotesListPage extends StatelessWidget {
   NotesListPage({super.key});
   final NotesController controller = Get.find<NotesController>();

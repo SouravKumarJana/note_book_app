@@ -21,7 +21,6 @@ class SyncQueue extends Table {
   TextColumn get noteId => text()();
   TextColumn get operationType => text()();
   IntColumn get retryCount => integer().withDefault(const Constant(0))();
-  
 }
 
 @DriftDatabase(tables: [Notes, SyncQueue])
